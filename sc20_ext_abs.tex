@@ -46,27 +46,27 @@ Spack, software management, modules, HPC
 \section{Introduction}\label{sec_intro}
 
 %%{\color{gray}(1) General challenge}
-Keeping scientific computing software packages up-to-date and easy to use for users is of ultimate importance of the success of a computing cluster's operation.
-In practice, this posses a challenge on a operational team.
-Especially when the number of scientific packages in an HPC environment is large, keeping every software deployment up to date for new releases and providing the persistent supports to the diverse needs from users become a tedious and time-consuming process. 
-The combinatorial nameing and versioning complexities easily get exploded among hundreds of package sets, module files and corresponding documents maintained by multiple system admins. 
+Keeping scientific computing software packages up-to-date and easy to use for users is of ultimate importance to a successful campus high performance computing (HPC) cluster operation in a research university environment.
+In practice, this can pose a challenge on a small operational team
+when the number of scientific packages on the HPC cluster is large (e.g. in the hundreds that we considered in this work). Keeping every software installation up to date and providing persistent support to the diverse user needs are tedious and time-consuming if done manually.
+The combinatorial naming and versioning complexities result in large number of package sets (e.g. built by different tool sets and optimized libraries), module files and the corresponding documents that need to be maintained by the operational team. 
 %%{\color{gray}(2) framework solution's advantages}
-The common solution for the above challenges is to use an software management framework (e.g. EasyBuild and Spack) to simplify or automate a significant amount of mundane work. 
-With the systemmatic way of configuring, building and deploying application packages, the framework approach shows to be promising to largely improve HPC cluster's operational efficiency. 
+A common solution for this challenge is to use an software management framework, such as EasyBuild[ref] and Spack[ref], to simplify or automate the mundane process. In a software management framework, the configre-build-deploy process is done in a systematic fashion; such an approach promises to largely improve HPC cluster's operational efficiency. 
 
 %%{\color{gray}(3) framework solution's limitations}
-However, as all the software management frameworks are still in a rapid development stage, a few limitations from the framework approach make it hard to serve as a solely suite along to manage software packages in practical sense.
-One of the issues for cluster system admins is that the restrictions from the frameworks are too rigid, even for the most flexible framework solution (Spack) and it make it not easy to plug into the existing software stack with the legacy system configurations. 
-Module naming schemes that differed from naive installation naming conventions required complex configuration to adapt to existing manual installation scheme. It is always difficult to manage software and dependencies built outside of the tools. 
-Another issue is that the systematic handling on various library dependencies results in many duplicate builds of the same software which introduces unnecesary confusions in the end user level experience. 
-The complexity of configurations in those frameworks is another stopping force where some functionalities are not mature enough for dealing with all the corner cases. It would be a challenge for finding a way to both take advantage of the powerful capability of framework approach and keep compatability with the existing naive approach.  
+However, as the software management frameworks, are still under development, albeit very powerful, a few limitations are noted in practice if a framework is used as a solely suite to manage software packages.
+First, from the cluster operation's standpoint, the restrictions from the frameworks may not be compatible with the site's existing/legacy package installation structure (referred to as manually-installed packages, including those done by in-house installation scripts), even for the most flexible framework solution that we consider in this work (i.e. Spack). ({\color{red} Shall we called it "locally-installed" vs. "framework-installed" instead? "manual" seems misleading.}) It is not possible to conveniently plug framework-installed packages into the existing manually-installed structures without significantly altering how the framework works. 
+Second, it is difficult produce a consistent view of available software modules to users when the framework's module file naming conventions are different from that defined by the operation team. 
+Third, It is always difficult to manage software and dependencies built outside of the tools. 
+Fourth, the framework's systematic handling on library dependencies results in many duplicate builds of the same software; this can create confusion if presented to users at once.
+Fifth, we note that a number of new, but less mature, functionalities in the framework are unable to handle corner cases that we encountered in practice. Given the above considerations, it would be ideal to have a way to take advantage of the powerful capability of framework approach and at the same time maintain compatibility complying to the operational team's design goals in terms of scientific package management.
 
 %%{\color{gray}(4) our approach and values/contributions of our work}
-In this paper we propose a practical approach for HPC cluster admins to manage software packages by hybridizing the framework approach and the naive installation approach. 
-Our central idea is to construct a higher layer above the software framework, where a mechanism is introduced to manage applications built from the framework and from manual installation to make the flexible customization possible to accomodate the existing software infrastructures in HPC cluster environment.
-Specifically, we select Spack as the candidate of package management framework tool and the practice of traditional naive package building environment is taken in UCLA high performance cluster Hoffman2.  
-We try to keep the spack and manually-installed system decoupling as possible as it could, so that it will hopefully give the enough time for frameworks to develop further while not halting the adoption right now. 
-Our major work is the creative ways to manipulate and re-organize the module files and propose a practical workflow to manage the building and maintaining process in a maximum scriptable/automatic way and provide a neat presentation interface to end users.
+In this paper we propose a practical approach for HPC cluster operational team to manage software packages by hybridizing the framework-based and the manual installation approaches. 
+From a software design point of view, the central idea is to add a layer above the software management frameworks, where a mechanism is introduced to manage applications built either from the framework or from manual installation to enable flexible customization, complying to the existing software infrastructures of the HPC cluster environment.
+In this work, we use Spack as the candidate package management framework tool but the proposed approach is quite general, not limited to a particular software management framework. We consider the deployment of the hybrid approach on UCLA Hoffman2 Cluster where the practice of manual package building environment already exists.
+It should be noted that we keep framework-installed and manually-installed packages decoupled as much as possible, so that it allows future adjustments when the frameworks or the HPC site's organization is further developed. 
+Our main contribution is a noble way to manipulate and re-organize the module files and propose a practical, automated and scriptable workflow to manage the building and maintaining processes and provide a coherent view to end users.
 
 
 \section{Managing Module Files} \label{sec_modulefiles}

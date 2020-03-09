@@ -33,8 +33,7 @@ schuang@idre.ucla.edu}
 \begin{abstract}
 This paper describes a new approach for managing the computational packages in an HPC cluster environment.
 In Section~\ref{sec_intro}, we first reviewed the system administration challenges to manage HPC applications in using traditional naive building way and the software management approach. Our work's goal and the paper's contribution were also clarified.
-We then discuss on a way to have an interface to hybridize both Spack and manual software installation ways to provide a better presentation to users as a proof of concept in Section~\ref{subsec_redefine_h2_modulefiles} and Section~\ref{subsec_modulefile_processing}. 
-A typical workflow is proposed in Section~\ref{sec_workflow}.  
+We then discuss on a way to have an interface to hybridize both Spack and manual software installation ways to provide a better presentation to users as a proof of concept in Section~\ref{sec_modulefiles}. A typical workflow is proposed in Section~\ref{sec_workflow}.  
 A brief conclusion is summarized in Section~\ref{sec_summary}.
 
 \end{abstract}
@@ -46,22 +45,20 @@ Spack, software management, modules, HPC
 \section{Introduction}\label{sec_intro}
 
 %%{\color{gray}(1) General challenge}
-Keeping scientific computing software packages up-to-date and easy to use for users in a research university environment is always a challenge when the number of scientific packages on the HPC cluster is large.
-%%%Keeping scientific computing software packages up-to-date and easy to use for users is of ultimate importance to a successful campus high performance computing (HPC) cluster operation in a research university environment.
-%%%In practice, this can pose a challenge on a small operational team when the number of scientific packages on the HPC cluster is large (e.g. in the hundreds that we considered in this work). 
-%%%Keeping every software installation up to date and providing persistent support to the diverse user needs are tedious and time-consuming if done manually.
-%%%The combinatorial naming and versioning complexities result in large number of package sets (e.g. built by different tool sets and optimized libraries), module files and the corresponding documents that need to be maintained by the operational team. 
+Keeping scientific computing software packages up-to-date and easy to use for users is of ultimate importance to a successful campus high performance computing (HPC) cluster operation in a research university environment.
+In practice, this can pose a challenge on a small operational team
+when the number of scientific packages on the HPC cluster is large (e.g. in the hundreds that we considered in this work). Keeping every software installation up to date and providing persistent support to the diverse user needs are tedious and time-consuming if done manually.
+The combinatorial naming and versioning complexities result in large number of package sets (e.g. built by different tool sets and optimized libraries), module files and the corresponding documents that need to be maintained by the operational team. 
 %%{\color{gray}(2) framework solution's advantages}
-A common solution for this challenge is to use an software management framework, such as EasyBuild\cite{geimer:14} and Spack\cite{gamblin:15}, to simplify or automate the mundane process. 
-%%%In a software management framework, the configre-build-deploy process is done in a systematic fashion; such an approach promises to largely improve HPC cluster's operational efficiency. 
+A common solution for this challenge is to use an software management framework, such as EasyBuild[ref] and Spack[ref], to simplify or automate the mundane process. In a software management framework, the configre-build-deploy process is done in a systematic fashion; such an approach promises to largely improve HPC cluster's operational efficiency. 
+
 %%{\color{gray}(3) framework solution's limitations}
 However, as the software management frameworks, are still under development, albeit very powerful, a few limitations are noted in practice if a framework is used as a solely suite to manage software packages.
-%%%First, from the cluster operation's standpoint, the restrictions from the frameworks may not be compatible with the site's existing/legacy package installation structure (referred to as manually-installed packages, including those done by in-house installation scripts), even for the most flexible framework solution that we consider in this work (i.e. Spack). ({\color{red} Shall we called it "locally-installed" vs. "framework-installed" instead? "manual" seems misleading.}) 
-Especially it is not possible to conveniently plug framework-installed packages into the existing manually-installed structures without significantly altering how the framework works. 
-%%%Second, it is difficult produce a consistent view of available software modules to users when the framework's module file naming conventions are different from that defined by the operation team. 
-%%%Third, It is always difficult to manage software and dependencies built outside of the tools. 
-%%%Fourth, the framework's systematic handling on library dependencies results in many duplicate builds of the same software; this can create confusion if presented to users at once.
-%%%Fifth, we note that a number of new, but less mature, functionalities in the framework are unable to handle corner cases that we encountered in practice. Given the above considerations, it would be ideal to have a way to take advantage of the powerful capability of framework approach and at the same time maintain compatibility complying to the operational team's design goals in terms of scientific package management.
+First, from the cluster operation's standpoint, the restrictions from the frameworks may not be compatible with the site's existing/legacy package installation structure (referred to as manually-installed packages, including those done by in-house installation scripts), even for the most flexible framework solution that we consider in this work (i.e. Spack). ({\color{red} Shall we called it "locally-installed" vs. "framework-installed" instead? "manual" seems misleading.}) It is not possible to conveniently plug framework-installed packages into the existing manually-installed structures without significantly altering how the framework works. 
+Second, it is difficult produce a consistent view of available software modules to users when the framework's module file naming conventions are different from that defined by the operation team. 
+Third, It is always difficult to manage software and dependencies built outside of the tools. 
+Fourth, the framework's systematic handling on library dependencies results in many duplicate builds of the same software; this can create confusion if presented to users at once.
+Fifth, we note that a number of new, but less mature, functionalities in the framework are unable to handle corner cases that we encountered in practice. Given the above considerations, it would be ideal to have a way to take advantage of the powerful capability of framework approach and at the same time maintain compatibility complying to the operational team's design goals in terms of scientific package management.
 
 %%{\color{gray}(4) our approach and values/contributions of our work}
 In this paper we propose a practical approach for HPC cluster operational team to manage software packages by hybridizing the framework-based and the manual installation approaches. 
@@ -71,56 +68,56 @@ It should be noted that we keep framework-installed and manually-installed packa
 Our main contribution is a noble way to manipulate and re-organize the module files and propose a practical, automated and scriptable workflow to manage the building and maintaining processes and provide a coherent view to end users.
 
 
-%%%\section{Managing Module Files} \label{sec_modulefiles}
+\section{Managing Module Files} \label{sec_modulefiles}
 
-%%%\subsection{Module file management in Spack}
-\section{Defining modulefile structures in user level} \label{subsec_redefine_h2_modulefiles}
+\subsection{Module file management in Spack}
 
 %%{\color{gray}General}
-%%%Adding a flexible management layer on top of framework rely on the exploration of the detailed module file structure generated by the framework.
-%%%In Spack, module files are automatically generated during the installation and it systematically collects all dependent libraries and provide the corresponding modules. 
-%%%The structure and format for module files are controlled by Spack's yaml scripts (\verb|config.yaml| and \verb|modules.yaml|).
-%%% and it can generate both flat and hierarchical structured module files at the same time. 
+Adding a flexible management layer on top of framework rely on the exploration of the detailed module file structure generated by the framework.
+In Spack, module files are automatically generated during the installation and it systematically collects all dependent libraries and provide the corresponding modules. 
+The structure and format for module files are controlled by Spack's yaml scripts (\verb|config.yaml| and \verb|modules.yaml|) and it can generate both flat and hierarchical structured module files at the same time. 
 
 %%{\color{gray}Flat}
-%%%The flat TCL/C module file structure generated by Spack has a straight-forward naming scheme under the root place with simple listing of package names 
-%%%concatenating the version and compiler/mpi information with unique hash code. 
-%%%As shown in Fig. \ref{fig:spack_flat} of an example that we installed on Hoffman2, different installations of each package are stored in the corresponding directory as TCL/C module files with a name concatenating the application version, compiler name, compiler version, and the mpi name and version. Plus, the TCL/C module files appends the unique hash code in order to distinguish the duplication names from minor difference of installations with the same version and same compiler/mpi info.
-%%%
-%%%\begin{figure}[htbp]
-%%%  \centerline{\includegraphics[width=\linewidth]{figures/spack_flat}}
-%%%  \caption{Flat structure of module files generated by Spack}
-%%%  \label{fig:spack_flat}
-%%%\end{figure}
+The flat module file structure generated by Spack has a straight-forward naming scheme under the root place with simple listing of package names. 
+As shown in Fig. \ref{fig:spack_flat} of an example that we installed on Hoffman2, different installations of each package are stored in the corresponding directory as TCL/C module files with a name concatenating the application version, compiler name, compiler version, and the mpi name and version. Plus, the TCL/C module files appends the unique hash code in order to distinguish the duplication names from minor difference of installations with the same version and same compiler/mpi info.
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=\linewidth]{figures/spack_flat}}
+  \caption{Flat structure of module files generated by Spack}
+  \label{fig:spack_flat}
+\end{figure}
 
 %%{\color{gray}Hierarchical}
-%%%At the same time, the hierarchical module files generated by Spack follows the typical Core/Compiler/MPI structures
-%%%Fig.~\ref{fig:spack_hier} shows an example of our modules.yaml configuration on Hoffman2. 
-%%%It can be noticed that the software installations are organized 
-%%%in a convoluted way.
-%%%, which means the applications under ``Core'' are the simplest with only dependency on system libraries, the ones under ``Compiler''s are dependent on the Spack-installed compilers only, the ones under ``MPI'' are dependent on both compilers and mpis. In Fig.~\ref{fig:spack_hier} we introduced customized ``openblas'' category to test the customization capabilities of Spack's modules.yaml. It can be understood as the in-between level of Compiler and MPI, which obviously adds more complexity in the MPI level directory. Every package installed is listed as a folder as its name under the corresponding directory levels. The module files for different versions are \texttt{lua} files with \texttt{.lua} extension and have a simpler name with its own version plus the unique hash code if necessary.
+At the same time, the hierarchical module files generated by Spack follows the typical Core/Compiler/MPI structures. Fig.~\ref{fig:spack_hier} shows an example of our modules.yaml configuration on Hoffman2. It can be noticed that the software installations are organized in a convoluted way, which means the applications under ``Core'' are the simplest with only dependency on system libraries, the ones under ``Compiler''s are dependent on the Spack-installed compilers only, the ones under ``MPI'' are dependent on both compilers and mpis. In Fig.~\ref{fig:spack_hier} we introduced customized ``openblas'' category to test the customization capabilities of Spack's modules.yaml. It can be understood as the in-between level of Compiler and MPI, which obviously adds more complexity in the MPI level directory. Every package installed is listed as a folder as its name under the corresponding directory levels. The module files for different versions are \texttt{lua} files with \texttt{.lua} extension and have a simpler name with its own version plus the unique hash code if necessary.
 
-%%%\begin{figure}[htbp]
-%%%  \centerline{\includegraphics[width=\linewidth]{figures/spack_hier}}
-%%%  \caption{Hierarchical structure of module files generated by Spack}
-%%%  \label{fig:spack_hier}
-%%%\end{figure}
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=\linewidth]{figures/spack_hier}}
+  \caption{Hierarchical structure of module files generated by Spack}
+  \label{fig:spack_hier}
+\end{figure}
 
 
-Adding a flexible management layer on top of framework rely on the exploration of the detailed module file structure generated by the framework.
-From our working practice, the customization configuration through yaml files in Spack is limited and not flexible enough to meet the needs.
-%%%Due to the systematic installation, the minor tweaks of flags and options for the same packages will be considered as different versions. 
-%%%But the naming scheme from Spack yaml script is impossible to cover all the cases. 
-Spack installation process always produces many duplication of installed packages/libs. Assigning a unique hash code for every version of all packages introduces the new confusions for general-level presentation to users.
-At the same time, Hierarchical structure generated from Spack is fixed. In some situations of the convoluted file structure defined from Spack may not be preferable it has nno way to customize it. 
-%%%In our Hoffman2 system, about 1/3 of existing packages in the HPC cluster has to be managed with the traditional manual way. 
-%%%We need to design a neat hierarchical module file structure so that the module files from Spack can have a unique mapping and the manually generated module files can also comply the definition.
+\subsection{Defining modulefile structures in user level} \label{subsec_redefine_h2_modulefiles}
+
+From our working practice, the customization configuration from Spack is still very limited and not flexible enough to meet the needs.
+Due to the systematic installation, the minor tweaks of flags and options for the same packages will be considered as different versions. But the naming scheme from Spack yaml script is impossible to cover all the cases. 
+Thus the Spack installation process always produces many duplication of installed packages/libs. Assigning a unique hash code for every version of all packages introduces the new confusions for general users with presenting a lot of seemingly redundant duplication packages with lacking of direct and explicit ways to expose the information to users.
+
+Another big limitation is that Hierarchical structure generated from Spack is fixed, there is currently no way to customize. In some situations, the convoluted file structure defined from Spack may not be preferable. 
+Especially in our Hoffman2 system, about 1/3 of existing packages in the HPC cluster has to be managed with the traditional manual way. We need to design a neat hierarchical module file structure so that the module files from Spack can have a unique mapping and the manually generated module files can also comply the definition.
+
+In order to get a better practical understanding on managing the module files on large scale HPC clusters, we closely inspected the module files on TACC. As shown in Fig. \ref{fig:tacc_hier}, TACC follows the Core/Compiler/MPI hierarchical structure but the MPI level is embedded inside the Compiler level. Since they still use \texttt{TCL/C} module system, they keep the traditional \texttt{modulefiles} sub-directory to contain the modulefiles for installed packages. It should be noted that they also have some special categories (e.g. \texttt{python2\_7}, \texttt{python3\_7}) as the nested levels inside the Compilers and MPIs.
+
+\begin{figure}[htbp]
+  \centerline{\includegraphics[width=\linewidth]{figures/tacc_hier}}
+  \caption{Hierarchical structure of module files in TACC}
+  \label{fig:tacc_hier}
+\end{figure}
 
 Based on our own experience and the understanding of ways to manage the module files on large scale HPC clusters (e.g. TACC), we propose the module files on Hoffman2 to be organized in a simple structure as shown in Fig. \ref{fig:h2_new_hier}, where the MPI level is nested in the compiler level. 
 The versions of compilers and MPIs are following the convention in Spack. 
-%%%We will use \texttt{lua} format which means the module files will have \texttt{.lua} extension. 
-%%%\texttt{modulefiles} sub-directory is preserved for denoting to store the installed packages' module files from the upper directories from the corresponding compilers, or MPIs or both. 
-The additional categories will be optional to be nested in Compiler level or Compiler+MPI levels if necessary. 
+We will use \texttt{lua} format which means the module files will have \texttt{.lua} extension. 
+\texttt{modulefiles} sub-directory is preserved for denoting to store the installed packages' module files from the upper directories from the corresponding compilers, or MPIs or both. The additional categories will be optional to be nested in Compiler level or Compiler+MPI levels if necessary. 
 
 \begin{figure}[htbp]
   \centerline{\includegraphics[width=\linewidth]{figures/h2_new_hier}}
@@ -128,16 +125,22 @@ The additional categories will be optional to be nested in Compiler level or Com
   \label{fig:h2_new_hier}
 \end{figure}
 
-\section{Python scripts for modulefile processing}\label{subsec_modulefile_processing}
+\subsection{Python scripts for modulefile processing}\label{subsec_modulefile_processing}
 
 After the definition of the new module file structure, the hybridizing work of Spack (framework-based) and the manually-installed systems will be done by implementing a script to import the module file information automatically generated from Spack, filter out the confusing duplication packages and the not-to-be-supported packages, make desired modifications on the to-be-supported module files to enforce the safety features, and export to the destination folder which will be the default module path for general users.
 
-Here we propose to a JSON-format list to contain the information about the packages that the system admins plan to support. An example of a JSON file will be like below.
-%%%, where only 3 packages will be supported and the versions are listed by concatenating the compiler's information:
+Before processing the modulefiles, we propose to a JSON-format list to contain the information about the packages that the system admins plan to support. An example of a JSON file will be like below, where only 3 packages will be supported and the versions are listed by concatenating the compiler's information:
 
-{\small
 \begin{verbatim}
-{   "bowtie2": {
+{   "bowtie": {
+        "name_in_spack": "bowtie",
+        "version": [
+            "1.2-gcc-7.2.0",
+            "1.2-gcc-5.5.0"
+        ],
+        "default": "1.2"
+    },
+    "bowtie2": {
         "name_in_spack": "bowtie2",
         "version": [
             "2.3.4.1-gcc-7.2.0",
@@ -145,11 +148,24 @@ Here we propose to a JSON-format list to contain the information about the packa
         ],
         "default": "2.3.4.1"
     },
+    "gcc": {
+        "name_in_spack": "gcc",
+        "version": [
+            "5.5.0-gcc-4.8.5",
+            "7.2.0-gcc-4.8.5"
+        ],
+        "default": "7.2.0"
+    }
 }
 \end{verbatim}
-}
 
-%%%where the main name in the json object pair is the application name preferred by system admins. The \verb|name_in_spack| is the name used in Spack. It can be blank if there is no cooresponding one in Spack. The \verb|version| keeps the application version information and the corresponding compilers. The default version that will be shown or selected by the \verb|Lmod| system.
+As shown in the example the json file defines an array of objects. Each of the objects contains a main name-value pair, where the main name is the application name given from system admins, e.g. \verb|bowtie|, \verb|bowtie2| and \verb|gcc|. The value of the main name contains another set of name-value pair defines the information of: 
+
+\begin{itemize}
+    \item the application name used in Spack \verb|name_in_spack|. It can be blank if there is no cooresponding one in Spack.
+    \item the application version that will be supported \verb|version|. The version keeps the information of compilers. In the future, it can contain the further information like MPI or Scalapack as well.
+    \item the default version that will be shown or selected by the \verb|Lmod| system. It can be noted that the version here will not need the additional compiler or MPI information, because of the enforced step-down step from hierarchical structure. 
+\end{itemize}
 
 Our approach is to take advantage of Spack's capability of generating both flat and hierarchical module files by enabling them in modules.yaml configuration file. As shown in Fig. \ref{fig:modulefilter_flowchart}, we first iterate over Spack's hierarchical module structures to obtain the hierarchical information about the installed packages and the hash codes generated from Spack. All collected information will be saved in a Sqlite database file. Then we iterate over Spack's flat-structured module files to find the ones in the database with the same hash code. By cross-checking the customized JSON file to decide the display option for the packages we can make the corresponding modifications for the module files and copy it to the destination directory. The modifications specifically include:
 
@@ -166,7 +182,26 @@ Our approach is to take advantage of Spack's capability of generating both flat 
   \label{fig:modulefilter_flowchart}
 \end{figure}
 
-In the SQLite database file (\verb|apps.db|), there is currently only one table (\verb|apps|) in the database. The schema of the table can be reviewed by \verb|.schema apps| inside the SQLite shell. The detailed scripts have been published in the gitlab repo\cite{gitlabrepo}.
+In the SQLite database file (\verb|apps.db|), there is currently only one table (\verb|apps|) in the database. The schema of the table can be reviewed by \verb|.schema apps| inside the SQLite shell. 
+
+\begin{itemize}
+    \item \verb|id|: integer, primary key with autoincrement.
+    \item \verb|appname|: text, the name of the application. Note: it will be the exact app's name in Spack if installed via Spack.
+    \item \verb|appver|: text, the version of the application. Note: it will be the exact app's version string in Spack if installed via Spack.
+    \item \verb|apphash|: text, the hash code of the installed application. Note: it will only has non-null values for packages installed via Spack. It will have NULL value for manually installed ones. Thus it can serve as the flag to know if the application installation is from Spack or manual installation.
+    \item \verb|compname|: text, the name of the compiler to compile the app. Note: it will be the exact compiler's name in Spack if installed via Spack.
+    \item \verb|compver|: text, the version of the compiler to compile the app. Note: it will be the exact compiler's version string in Spack if installed via Spack.
+    \item \verb|mpiname|: text, the name of the MPI to compile the app. Note: it will be the exact MPI's name in Spack if installed via Spack.
+    \item \verb|mpiver|: text, the version of the MPI to compile the app. Note: it will be the exact compiler's version string in Spack if installed via Spack.
+    \item \verb|mpihash|: text, the hash code of the installed MPI package to compile the application. Note: it will only has non-null values for packages installed via Spack. It will have NULL value for manually installed ones.
+    \item \verb|hierpath|: text, the module file path in the hierarchical module structure. For the Spack-installed package, it will be in the Spack-defined hierarchical modulefile folder. For the manually-installed package, it will keep blank.
+    \item \verb|flatpath|: text, the module file path in the flat module structure. For the Spack-installed package, it will be in the Spack-defined hierarchical modulefile folder. For the manually-installed package, it will the customized pathes for the manually-formed module file. It should be noted that the module file from manual installation does not have to be the one for flat structure. It can be from the hierarchical one.
+    \item \verb|custpath|: text, the destination path for the module file to be presented to users. It can leave blank.
+    \item \verb|present|: integer, the flag to show if the module file to be presented to users. It can leave blank for module filter script to update the value according to JSON file.
+
+\end{itemize}
+
+We also discussed about managing the installed (built or pre-built) libraries under the specific language (R or Python) environments in the modulefile processing script. A possible way is to generate the list of installed packages/libraries for the versions of R or Anaconda Python as separate text files and provide the information about the directories in the \texttt{module show} commands. This function is not yet implemented but very doable in the picture.
 
 
 \section{Practical Workflows} \label{sec_workflow}
@@ -175,34 +210,31 @@ The practical process to hybridize the Spack-installed and manually-installed pa
 
 \begin{figure}[htbp]
   \centerline{\includegraphics[width=\linewidth]{figures/spack_h2_hybrid_flow}}
-  \caption{Workflow to hybridize the Spack-installed and manually-installed packages}
+  \caption{The workflow to hybridize the Spack-installed and manually-installed packages}
   \label{fig:spack_h2_hybrid_flow}
 \end{figure}
 
-The workflow shows a basic process to check and install a newly requested application into the hybrid system. 
-%%%A couple of notes are listed below for further explantation:
-%%%
-%%%\begin{itemize}
-%%%    \item All the installation processes are assumed to be taken as a specific non-root user.
-%%%    \item The standard SQL \verb|select| query would be used to check if the newly requested package with the specific requested version has been installed on Hoffman2 or not.
-%%%    \item If installation is needed, the command \verb|spack list $APPNAME|\cite{spack:20} can be used to check if there is any available package whose name contains \verb|$APPNAME| Spack can install. 
-%%%    \item If Spack provides the available package to install, the command \verb|spack install $APPNAME|\cite{spack:20} can be used to install it. As a reference, we installed 180+ packages on Hoffman2 using \verb|spack install| commands. 
-%%%    \item For packages needed the manual installation, a SQL \verb|insert| command will be needed to populate the information into the database. It should be noted that the field \verb|apphash| has to leave blank as the flag to denote the installation is not from Spack.
-%%%    \item The \verb|lmod| modulefile from manually installed package will needed to be written manually as well. It can be the \verb|TCL/C|-based script or \verb|lua|-based one, since the modulefilter script will do the conversion. The directory for drafting the module file can be arbitrary but has to be consistent with the value of the \verb|flatpath| in the database record inserted above.
-%%%    \item The JSON file has to be updated according the schema described in Section \ref{subsec_modulefile_processing}. 
-%%%\end{itemize}
+The workflow shows a basic process to check and install a newly requested application into the hybrid system. A couple of notes are listed below for further explantation:
+
+\begin{itemize}
+    \item All the installation processes are assumed to be taken as a specific non-root user.
+    \item The standard SQL \verb|select| query would be used to check if the newly requested package with the specific requested version has been installed on Hoffman2 or not.
+    \item If installation is needed, the command \verb|spack list $APPNAME|\cite{spack:20} can be used to check if there is any available package whose name contains \verb|$APPNAME| Spack can install. 
+    \item If Spack provides the available package to install, the command \verb|spack install $APPNAME|\cite{spack:20} can be used to install it. As a reference, we installed 180+ packages on Hoffman2 using \verb|spack install| commands. 
+    \item For packages needed the manual installation, a SQL \verb|insert| command will be needed to populate the information into the database. It should be noted that the field \verb|apphash| has to leave blank as the flag to denote the installation is not from Spack.
+    \item The \verb|lmod| modulefile from manually installed package will needed to be written manually as well. It can be the \verb|TCL/C|-based script or \verb|lua|-based one, since the modulefilter script will do the conversion. The directory for drafting the module file can be arbitrary but has to be consistent with the value of the \verb|flatpath| in the database record inserted above.
+    \item The JSON file has to be updated according the schema described in Section \ref{subsec_modulefile_processing}. 
+\end{itemize}
 
 
 \section{Summary} \label{sec_summary}
 
-In this paper we proposed an approach to hybridize the software management framework and the traditional manual package management. The design is to build an additional layer on top of the framework for taking advantage of the automatic building and management from the framework and the highly customization requirement from the traditional manual management. With the definition of a neat common module file structure in the cluster environment, the python script is able to process, filter and re-direct the module files from the framework to any destination for final general-user presentation. A management workflow is also proposed as a practical reference. 
+In this report we documented our effort for investigating Hoffman2 Software Management during the past year. Specifically we proposed a plan for Hoffman2 software installation structure and summarize the related installation work. We also discussed a way to have an interface to hybridize both Spack and manual software installation ways to provide a better presentation to users as a proof of concept.
 
 \begin{thebibliography}{00}
-\bibitem{geimer:14} Markus Geimer, Kenneth Hoste, Robert McLay. ``Modern Scientific Software Management Using EasyBuild and Lmod'' HUST '14: Proceedings of the First International Workshop on HPC User Support Tools, page 41-51, November 2014.
 \bibitem{gamblin:15} Todd Gamblin, Matthew LeGendre, Michael R. Collette, Gregory L. Lee, Adam Moody, Bronis R. de Supinski, and Scott Futral. ``The spack package manager: bringing order to hpc software chaos,'' SC ’15 Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis, 2015.
 \bibitem{mclay:11} R. McLay, K. W. Schulz, W. L. Barth, and T. Minyard. ``Best practices for the deployment and management of production hpc clusters,'' In SC ’11 In State of the Practice Reports, page 9:1–9:11, 2011.
 \bibitem{spack:20} https://spack.readthedocs.io/en/latest/
-\bibitem{gitlabrepo} https://gitlab.idre.ucla.edu/hoffman2/modulefile-processing
 \end{thebibliography}
 
 \end{document}

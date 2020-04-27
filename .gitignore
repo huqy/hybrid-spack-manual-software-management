@@ -10,3 +10,5 @@
 *.synctex.gz
 *.pdf
 !figures/*.pdf
+.DS_Store
+*.bak

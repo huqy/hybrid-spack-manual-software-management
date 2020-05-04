@@ -171,9 +171,9 @@ Our approach is to take advantage of Spack's capability of generating both flat 
 In the SQLite database file (\verb|apps.db|), there is currently only one table (\verb|apps|) in the database. The schema of the table can be reviewed by \verb|.schema apps| inside the SQLite shell. The detailed scripts can be publicly accessed in the gitlab repo\cite{gitlabrepo}.
 
 
-\section{Practical Workflows} \label{sec_workflow}
+\section{Operational workflows} \label{sec_workflow}
 
-The practical workflow process to hybridize the Spack-installed and manually-installed packages can be built based on the proposed structures. Inparticular we use the JSON file and SQLite file defined in Section \ref{subsec_modulefile_processing} to coordinate both ways of installation. Figure \ref{fig:spack_h2_hybrid_flow} below shows one possibility of workflow of installing a package, from the installation request to displaying the module.
+The workflow to hybridize the Spack-installed and manually-installed packages as described in Section \ref{subsec_modulefile_processing} is illustrated in Figure \ref{fig:spack_h2_hybrid_flow}, showing an example of the process of installing a package on the HPC cluster, starting from an installation request and ending with displaying the module(s) to end users.
 
 \begin{figure}[htbp]
   \centerline{\includegraphics[width=\linewidth]{figures/spack_h2_hybrid_flow}}
@@ -181,7 +181,6 @@ The practical workflow process to hybridize the Spack-installed and manually-ins
   \label{fig:spack_h2_hybrid_flow}
 \end{figure}
 
-The workflow shows a basic process to check and install a newly requested application into the hybrid system. 
 %%%A couple of notes are listed below for further explantation:
 %%%
 %%%\begin{itemize}

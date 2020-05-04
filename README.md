@@ -1,5 +1,7 @@
 This is the repo for preparing the submission to SC'20 to summarize UCLA IDRE RTG HPC group's work on Hoffman2 Software Management under CentOS-7 environments. 
 
+[Submission deadlines](https://sc20.supercomputing.org/submit/submission-deadlines/)
+
 To build the pdf file for the extended abstract, run
 
 ```

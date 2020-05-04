@@ -196,7 +196,7 @@ The workflow to hybridize the Spack-installed and manually-installed packages as
 
 \section{Summary} \label{sec_summary}
 
-In this paper we proposed an approach to hybridize the software management framework and the traditional manual package management. The design is to build an additional layer on top of the framework for taking advantage of the automatic building and management from the framework and the highly customization requirement from the traditional manual management. With the definition of a neat common module file structure in the cluster environment, the python script is able to process, filter and re-direct the module files from the framework to any destination for final general-user presentation. A management workflow is also proposed as a practical reference. 
+In this work we proposed an approach to hybridize the software management framework and the traditional manual package management. The design adds a layer on top of the standard package management framework, in order to take advantage of the powerful framework, the flexibility of the traditional manual management and the desired the HPC user interface, via the use of modulefiles constructed to prevent loading incomptabible packages. With the definition of a customizable module file structure in the HPC cluster environment, the workflow is able to process, filter and integrate the module files from two independent sources (i.e. framework-based and manual-based) to any target modulefile presentation. 
 
 \begin{thebibliography}{00}
 \bibitem{geimer:14} Markus Geimer, Kenneth Hoste, Robert McLay. ``Modern Scientific Software Management Using EasyBuild and Lmod'' HUST '14: Proceedings of the First International Workshop on HPC User Support Tools, page 41-51, November 2014.

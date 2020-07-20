@@ -34,7 +34,7 @@ schuang@idre.ucla.edu}
 In this work we present a new approach for managing the scientific packages in an HPC cluster environment, particularly suitable in a research university environment that has a diverse user base.
 %%%Having to install and maintain a large number of software packages to support the boradband spectrum of university research motivates the use of a software installation framework to lessen the burden on the HPC operational team. Challenges arise when the framework has to be integrated with in-house package installation pratice already existed. In practice, the in-house installation component is required because not all packages can be satisfactorily covered by a software management framework.
 The goal is trying to lessen the HPC operational team's burden when installing and maintaining a large number of software packages to support a broadband spectrum of university research. 
-We propose a hybridizing management method that can harness both the power of a software management framework and the flexibility of in-house, or ``manual'', installation sources, and can present an coherent view to the end users. Spack~\cite{gamblin:15} framework was used as an example in this work, but our approach is expected to be applicable to other framework tools. The manipulation of environment module files and the typical workflow are illustrated, followed by discussions.
+We propose a hybridizing management method that can harness both the power of a software management framework and the flexibility of in-house, or ``manual'', installation sources, and can present a coherent view to the end users. Spack~\cite{gamblin:15} framework was used as an example in this work, but our approach is expected to be applicable to other framework tools. The manipulation of environment module files and the typical workflow are illustrated, followed by discussions.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -61,11 +61,11 @@ software management, modules, Spack, HPC
 %%%Fourth, the framework's systematic handling on library dependencies results in many duplicate builds of the same software; this can create confusion if presented to users at once.
 %%%Fifth, we note that a number of new, but less mature, functionalities in the framework are unable to handle corner cases that we encountered in practice. Given the above considerations, it would be ideal to have a way to take advantage of the powerful capability of framework approach and at the same time maintain compatibility complying to the operational team's design goals in terms of scientific package management.
 
-Having to install and maintain a large number of software packages to support the broadband spectrum of university research motivates the use of a software installation framework, such as EasyBuild\cite{geimer:14} or Spack\cite{gamblin:15}, to automate the process and thus lessen the burden on the HPC operational team. 
-However, challenges arise when the framework has to be integrated with in-house package installation practice already existed. In practice, the in-house installation component is required because not all packages can be satisfactorily managed within a software management framework.
+Having to install and maintain a large number of software packages to support the broadband spectrum of university research motivates the use of a software installation framework, such as EasyBuild\cite{geimer:14} or Spack\cite{gamblin:15}, to automate the processes and thus lessen the burden on HPC operational teams. 
+However, challenges arise when the framework has to be integrated with in-house package installation practices already existed. In practice, the in-house installation component is required because not all packages can be satisfactorily managed within a software management framework.
 
 %%{\color{gray}(4) our approach and values/contributions of our work}
-In this work, we propose a practical approach for HPC cluster operational team to manage software packages by hybridizing the framework and manual-based installation methods. 
+In this work, we propose a practical approach for HPC cluster operational teams to manage software packages by hybridizing the framework and manual-based installation methods. 
 From a software design point of view, our central idea is to add a layer above the existing software management frameworks, where a workflow is introduced to manage applications built either by the framework or by manual installation to enable flexible customization, complying to the existing structure of the HPC cluster environment.
 In this paper, we adopt Spack as the package management framework. The proposed approach is applicable to using other software management frameworks. We consider the deployment of the hybrid approach on UCLA Hoffman2 Cluster where an in-house package installation structure already exists.
 It should be noted that the framework-installed and manually-installed packages are kept separate by design, so it will allow future changes of the HPC environment, including the possibility of adopting another installation framework.
@@ -113,12 +113,12 @@ Adding a flexible management layer on top of framework requires traversing the m
 From our experiences in practice, configuration through Spack's YAML files is not flexible enough for our needs.
 %%%Due to the systematic installation, the minor tweaks of flags and options for the same packages will be considered as different versions. 
 %%%But the naming scheme from Spack yaml script is impossible to cover all the cases. 
-Specifically, Spack's installation process can create multiple duplications of installed packages and libraries. Presenting all versions of the Spack-built software packages, with embeded unique hash codes in the package's display names, at once can confuse the end users.
-In addition, the predefined hierarchical structure create by Spack is quite rigid and incompatible for our use case. There seems to be no easy way to customize it. 
+Specifically, Spack's installation processes create multiple duplications of installed packages and libraries. Presenting all versions of the Spack-built software packages, with embeded unique hash codes in the package's display names at once, introduces big confusion to the end users.
+In addition, the predefined hierarchical structure create by Spack is quite rigid and incompatible for our pre-existed cluster environment. There seems to be no easy way to customize it. 
 %%%In our Hoffman2 system, about 1/3 of existing packages in the HPC cluster has to be managed with the traditional manual way. 
 %%%We need to design a neat hierarchical module file structure so that the module files from Spack can have a unique mapping and the manually generated module files can also comply the definition.
 
-Based on our own experience, also motivated by the operation of other large-scale HPC clusters (e.g. TACC Stampede), we propose that the module files are organized in a simple structure as shown in Fig. \ref{fig:h2_new_hier}, where the MPI level is nested in the compiler level. 
+Based on our experience, also motivated by the operation of other large-scale HPC clusters (e.g. TACC Stampede), we first propose the module files to be organized in a simple structure as shown in Fig. \ref{fig:h2_new_hier}, where the MPI level is nested in the compiler level. 
 The versions of compilers and MPIs follow the convention in Spack. 
 %%%We will use \texttt{lua} format which means the module files will have \texttt{.lua} extension. 
 %%%\texttt{modulefiles} sub-directory is preserved for denoting to store the installed packages' module files from the upper directories from the corresponding compilers, or MPIs or both. 
@@ -132,9 +132,9 @@ Additional categories can be nested in Compiler level or Compiler+MPI levels if 
 
 \section{Hybridization of modulefiles}\label{subsec_modulefile_processing}
 
-With our own design of module file structure, hybridization of Spack (framework-based) and the manually-installed systems is achieved by implementing a configurable procedure to (1) traverse the modulefile tree generated by Spack, (2) filter out the undesirable packages (e.g. duplicates and not-to-be-supported packages), and (3) export the results to a new modulefile tree which will be the default module path for end users.
+With our own design of module file structure defined in Section \ref{subsec_redefine_h2_modulefiles}, hybridization of the framework-based (Spack) and the manually-installed systems is achieved by implementing a configurable procedure to (1) traverse the modulefile tree generated by Spack, (2) filter out the undesirable packages (e.g. duplicates and not-to-be-supported packages), and (3) export the results to a new modulefile tree which will be the default module path for end users.
 
-We use JSON to express the information of the packages that the HPC operational team will support, i.e. visible to end users. An example of a JSON file is listed below:
+We use JSON to express the information of the packages that our HPC operational team will support, i.e. visible to end users. An example of a JSON file is listed below:
 %%%, where only 3 packages will be supported and the versions are listed by concatenating the compiler's information:
 
 {\small
@@ -173,7 +173,7 @@ In the SQLite database, (\verb|apps.db|), there is currently only one table, (\v
 
 \section{Operational workflows} \label{sec_workflow}
 
-The workflow to hybridize the Spack-installed and manually-installed packages as described in Section \ref{subsec_modulefile_processing} is illustrated in Figure \ref{fig:spack_h2_hybrid_flow}, showing an example of the process of installing a package on the HPC cluster for a system admin, starting from recieving an installation request, logging into a dedicated account (\verb|$SPACK_ADMIN|) and ending with displaying the module(s) to end users. 
+The workflow to hybridize the Spack-installed and manually-installed packages as described in Section \ref{subsec_modulefile_processing} is illustrated in Figure \ref{fig:spack_h2_hybrid_flow}, showing an example of the process of installing a package on the HPC cluster for a system admin, starting from recieving an installation request, logging into a dedicated account (\verb|$SPACK_ADMIN|) and ending with displaying the module(s) to end users. It should be noted that the workflow can be also taken in any subgroup package environment defined in Spack \cite{spack-env:20}.
 
 \begin{figure}[htbp]
   \centerline{\includegraphics[width=\linewidth]{figures/spack_h2_hybrid_flow}}
@@ -196,14 +196,19 @@ The workflow to hybridize the Spack-installed and manually-installed packages as
 
 \section{Summary} \label{sec_summary}
 
-In this work we proposed an approach to hybridize the software management framework and the traditional manual package management. The design adds a layer on top of the standard package management framework, in order to take advantage of the powerful framework, the flexibility of the traditional manual management and the desired the HPC user interface, via the use of modulefiles constructed to prevent loading incomptabible packages. With the definition of a customizable module file structure in the HPC cluster environment, the workflow is able to process, filter and integrate the module files from two independent sources (i.e. framework-based and manual-based) to any target modulefile presentation. 
+In this work we proposed an approach to hybridize the software management framework and the traditional manual package management. 
+%The design adds a layer on top of the standard package management framework, in order to take advantage of the powerful framework, the flexibility of the traditional manual management and the desired HPC user interface, via the use of modulefiles constructed to prevent loading incomptabible packages. 
+The design adds a layer on top of the standard package management framework expecting to take advantage of the powerfule framework while maintaining the management flexibility for manual installations and the customizable HPC user interface. 
+%With the definition of a customizable module file structure in the HPC cluster environment, the workflow is able to process, filter and integrate the module files from two independent sources (i.e. framework-based and manual-based) to any target modulefile presentation. 
+With the definition of a module file structure in the HPC cluster environment, the workflow is able to process, filter and integrate the module files from two independent sources (i.e. framework-based and manual-based) to any target modulefile presentation. 
 
 \begin{thebibliography}{00}
 \bibitem{geimer:14} Markus Geimer, Kenneth Hoste, Robert McLay. ``Modern Scientific Software Management Using EasyBuild and Lmod'' HUST '14: Proceedings of the First International Workshop on HPC User Support Tools, page 41-51, November 2014.
 \bibitem{gamblin:15} Todd Gamblin, Matthew LeGendre, Michael R. Collette, Gregory L. Lee, Adam Moody, Bronis R. de Supinski, and Scott Futral. ``The spack package manager: bringing order to hpc software chaos,'' SC ’15 Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis, 2015.
 \bibitem{mclay:11} R. McLay, K. W. Schulz, W. L. Barth, and T. Minyard. ``Best practices for the deployment and management of production hpc clusters,'' In SC ’11 In State of the Practice Reports, page 9:1–9:11, 2011.
-\bibitem{spack:20} https://spack.readthedocs.io/en/latest/
-\bibitem{gitlabrepo} https://gitlab.idre.ucla.edu/hoffman2/modulefile-processing
+\bibitem{spack:20} \href{https://spack.readthedocs.io/en/latest}{https://spack.readthedocs.io/en/latest}
+\bibitem{gitlabrepo} \href{https://gitlab.idre.ucla.edu/hoffman2/modulefile-processing}{https://gitlab.idre.ucla.edu/hoffman2/modulefile-processing}
+\bibitem{spack-env:20} \href{https://spack.readthedocs.io/en/latest/environments.html}{https://spack.readthedocs.io/en/latest/environments.html}
 \end{thebibliography}
 
 \end{document}

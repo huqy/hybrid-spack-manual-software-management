@@ -12,3 +12,4 @@
 !figures/*.pdf
 .DS_Store
 *.bak
+*.swp

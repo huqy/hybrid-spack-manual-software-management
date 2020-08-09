@@ -8,6 +8,13 @@ To build the pdf file for the extended abstract, run
 make 
 ```
 
+To build the pdf file for the beamer poster [ 70in(5.83ft width) X 38in(3.17ft height) ], run
+
+```
+make poster
+```
+
+
 To build the pdf file for the full-size paper, run
 
 ```

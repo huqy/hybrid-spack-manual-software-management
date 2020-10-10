@@ -112,19 +112,73 @@ We propose a hybridizing management method that can harness the power of modern 
 %	INTRODUCTION
 %----------------------------------------------------------------------------------------
 
-\begin{block}{Introduction}
+\begin{block}{Challenges}
 
-\hspace{2em}Having to install and maintain a large number of software packages to support the broadband spectrum of university research motivates the use of a software installation framework, such as EasyBuild\cite{geimer:14} or Spack\cite{gamblin:15}, to automate the processes and thus lessen the burden on HPC operational teams. 
-However, challenges arise when the framework has to be integrated with in-house package installation practices already existed. In practice, the in-house installation component is required because not all packages can be satisfactorily managed within a software management framework.
+%%\hspace{2em}Having to install and maintain a large number of software packages to support the broadband spectrum of university research motivates the use of a software installation framework, such as EasyBuild\cite{geimer:14} or Spack\cite{gamblin:15}, to automate the processes and thus lessen the burden on HPC operational teams. 
+%%However, challenges arise when the framework has to be integrated with in-house package installation practices already existed. In practice, the in-house installation component is required because not all packages can be satisfactorily managed within a software management framework.
 
-\hspace{2em}In this work, we propose a practical approach for HPC cluster operational teams to manage software packages by hybridizing the framework and manual-based installation methods. 
-From a software design point of view, our central idea is to add a layer above the existing software management frameworks, where a workflow is introduced to manage applications built either by the framework or by manual installation to enable flexible customization, complying to the existing structure of the HPC cluster environment.
-In this paper, we adopt Spack as the package management framework. The proposed approach is applicable to using other software management frameworks. We consider the deployment of the hybrid approach on UCLA Hoffman2 Cluster where an in-house package installation structure already exists.
-It should be noted that the framework-installed and manually-installed packages are kept separate by design, so it will allow future changes of the HPC environment, including the possibility of adopting another installation framework.
-A main contribution of this work is a noble way to manipulate and re-organize the environment modules and offer a practical, automated and script-able workflow to build and maintain the packages, and to provide a coherent view to end users.
+%%\hspace{2em}In this work, we propose a practical approach for HPC cluster operational teams to manage software packages by hybridizing the framework and manual-based installation methods. 
+%%From a software design point of view, our central idea is to add a layer above the existing software management frameworks, where a workflow is introduced to manage applications built either by the framework or by manual installation to enable flexible customization, complying to the existing structure of the HPC cluster environment.
+%%In this paper, we adopt Spack as the package management framework. The proposed approach is applicable to using other software management frameworks. We consider the deployment of the hybrid approach on UCLA Hoffman2 Cluster where an in-house package installation structure already exists.
+%%It should be noted that the framework-installed and manually-installed packages are kept separate by design, so it will allow future changes of the HPC environment, including the possibility of adopting another installation framework.
+%%A main contribution of this work is a noble way to manipulate and re-organize the environment modules and offer a practical, automated and script-able workflow to build and maintain the packages, and to provide a coherent view to end users.
+
+\setlength{\leftmargini}{1cm}
+\setlength{\leftmarginii}{2.5cm}
+\setlength{\leftmarginiii}{2.5cm}
+\begin{itemize}
+    \item Challenges when managing software manually from individual sources: 
+        \begin{itemize}
+            \item Combinatorial complexity is exploding: at UCLA > 10,000 combinations
+        \end{itemize}
+        \begin{figure}[htbp]
+          \centerline{\includegraphics[width=1\linewidth]{figures/CombComp_ucla.pdf}}
+          \label{fig:combcomp_ucla}
+        \end{figure}
+
+    \vspace{-1em}
+    \item Challenges when using software management framework:
+        \begin{itemize}
+            \item ``Seemingly'' duplicated copies of installed packages from Spack 
+                \begin{figure}[htbp]
+                  \centerline{\includegraphics[width=0.85\linewidth]{figures/dup_pkgs.pdf}}
+                  \label{fig:dup_pkgs}
+                \end{figure}
+            \vspace{-1.2em}
+            \item Non-trivial to customize modulefile structures from Spack
+                \begin{figure}[htbp]
+                  \centerline{\includegraphics[width=0.85\linewidth]{figures/default_hiermod.pdf}}
+                  \label{fig:default_hiermod}
+                \end{figure}
+            \vspace{-0.5em}
+            \item People (sysadmins \& users) are hesitated to move in
+                \begin{itemize}
+                    \item Overwhelmed by the complexity controlled in a ``Spack-ish'' way
+                    \item Huge momentum to keep the existing scheme/work
+                    \item Are cautiously waiting for further updates
+                    \item OK to tolerate sub-optimal runtime performance in university environments
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
 
 \end{block}
 
+\begin{block}{Our Working Goal}
+\setlength{\leftmargini}{1cm}
+\setlength{\leftmarginii}{3.5cm}
+\setlength{\leftmarginiii}{2.5cm}
+\begin{itemize}
+    \item To introduce a top layer to make the framework-based software management system and the manually-installed system \textbf{co-exist}
+        \vspace{0.25em}
+        \begin{itemize}
+            \item For sys admins:  workflow scriptable as much as possible
+            \item For end users:   package list presented as clean as possible
+        \end{itemize}
+
+
+\end{itemize}
+\end{block}
 %------------------------------------------------
 
 %== \begin{figure}
@@ -186,7 +240,7 @@ We use JSON to express the information of the packages that our HPC operational 
 \}, \\
 }
 
-where the main name in the json object pair is the application name preferred by system admins. The \texttt{name\_in\_spack} is the name used in Spack. It can be blank if there is no cooresponding one in Spack. The \texttt{version} keeps the application version information and the corresponding compilers. The default version that will be shown or selected by the \texttt{Lmod} system.
+where the main name in the json object pair is the application name preferred by system admins. The \texttt{name\_in\_spack} is the name used in Spack. It can be blank if there is no cooresponding one in Spack. The \texttt{version} keeps the application version information and the corresponding compilers. The default version that will be shown or selected by the \texttt{Lmod} system\cite{mclay:11}.
 
 \end{block}
 
@@ -227,12 +281,12 @@ Our approach takes advantage of Spack's capability of generating both flat and h
 %	Workflow
 %----------------------------------------------------------------------------------------
 
-\vspace{-1em}
+\vspace{-2em}
 \begin{block}{Operational Workflow}
 
 \begin{figure}
   \centerline{\includegraphics[width=0.8\linewidth]{figures/spack_h2_hybrid_flow}}
-  \caption{Workflow to hybridize the Spack-installed and manually-installed packages}
+  \caption{Workflow to hybridize the Spack-installed and manually-installed packages for an administrator to install a requested package}
 \end{figure}
 
 
@@ -264,9 +318,17 @@ With the definition of a module file structure in the HPC cluster environment, t
 
 \begin{block}{Additional Information}
 
-Our work has been uploaded to the gitlab repo:
+\setlength{\leftmarginii}{2.5cm}
 \begin{itemize}
-\item \href{https://gitlab.idre.ucla.edu/hoffman2/modulefile-processing}{https://gitlab.idre.ucla.edu/hoffman2/modulefile-processing}
+\item We will present our work in the ``Software Provisioning'' session in SC'20 State of Practice Talks on Nov 17, 2020 at 1:30PM:
+    \begin{itemize}
+        \item \href{https://sc20.supercomputing.org/presentation/?id=sotp110\&sess=sess289}{https://sc20.supercomputing.org/presentation/?id=sotp110\&sess=sess289}
+    \end{itemize}
+\vspace{0.5em}
+\item Please feel free to check out our demo code in the gitlab repo:
+    \begin{itemize}
+        \item \href{https://gitlab.idre.ucla.edu/hoffman2/modulefile-processing}{https://gitlab.idre.ucla.edu/hoffman2/modulefile-processing}
+    \end{itemize}
 \end{itemize}
 
 \end{block}
@@ -282,8 +344,8 @@ Our work has been uploaded to the gitlab repo:
 %\bibliography{sample}\vspace{0.75in}}
 
 \begin{thebibliography}{00}
-\bibitem{geimer:14} Markus Geimer, Kenneth Hoste, Robert McLay. ``Modern Scientific Software Management Using EasyBuild and Lmod'' HUST '14: Proceedings of the First International Workshop on HPC User Support Tools, page 41-51, November 2014.
 \bibitem{gamblin:15} Todd Gamblin, Matthew LeGendre, Michael R. Collette, Gregory L. Lee, Adam Moody, Bronis R. de Supinski, and Scott Futral. ``The spack package manager: bringing order to hpc software chaos,'' SC ’15 Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis, 2015.
+\bibitem{geimer:14} Markus Geimer, Kenneth Hoste, Robert McLay. ``Modern Scientific Software Management Using EasyBuild and Lmod'' HUST '14: Proceedings of the First International Workshop on HPC User Support Tools, page 41-51, November 2014.
 \bibitem{mclay:11} R. McLay, K. W. Schulz, W. L. Barth, and T. Minyard. ``Best practices for the deployment and management of production hpc clusters,'' In SC ’11 In State of the Practice Reports, page 9:1–9:11, 2011.
 \bibitem{spack:20} \href{https://spack.readthedocs.io/en/latest}{https://spack.readthedocs.io/en/latest}
 %== \bibitem{geimer:14} Markus Geimer, et al. HUST '14: Proceedings of the First International Workshop on HPC User Support Tools, page 41-51, November 2014.
@@ -324,9 +386,10 @@ Our work has been uploaded to the gitlab repo:
 
 \end{alertblock}
 
+\vspace{-1em}
 \begin{center}
 \begin{tabular}{ccc}
-\includegraphics[width=0.4\linewidth]{figures/ucla_logo.jpg} & \hfill & \includegraphics[width=0.4\linewidth]{figures/idre_logo.jpg}
+\includegraphics[width=0.4\linewidth]{figures/ucla_logo.pdf} & \hfill & \includegraphics[width=0.4\linewidth]{figures/idre_logo.pdf}
 \end{tabular}
 \end{center}
 
